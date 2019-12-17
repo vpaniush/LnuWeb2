@@ -101,3 +101,6 @@ typings/
 
 # Seed directory
 seed/
+
+#Auth keys
+config/keys.js
