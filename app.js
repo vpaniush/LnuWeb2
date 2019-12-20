@@ -10,6 +10,7 @@ var flash = require('connect-flash');
 var passportConfig = require('./config/passport-config');
 var cookieSession = require('cookie-session');
 var keys = require('./config/keys');
+var Wine = require('./models/wine');
 
 var indexRouter = require('./routes/index');
 var authRouter = require('./routes/auth');
@@ -19,6 +20,26 @@ mongoose.connect('mongodb://localhost:27017/shop-db');
 var app = express();
 
 hbs.registerPartials(__dirname + '/views/partials');
+hbs.registerHelper('totalCount', (cart) => {
+  var count = 0;
+  for (var title in cart) {
+    count += cart[title]['count'];
+  }
+  return count;
+});
+
+hbs.registerHelper('itemTotalPrice', (title, cart) => {
+  return cart[title]['count'] * cart[title]['totalPrice'];
+});
+
+hbs.registerHelper('cartTotalPrice', (cart) => {
+  console.log(cart);
+  var sum = 0;
+  for (var title in cart) {
+    sum += cart[title]['count'] * cart[title]['totalPrice'];
+  }
+  return sum;
+});
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
@@ -37,8 +58,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
 app.use('/auth', authRouter);
+app.use('/', indexRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
